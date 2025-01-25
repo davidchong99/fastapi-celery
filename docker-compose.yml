@@ -1,0 +1,94 @@
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"    # AMQP protocol port
+      - "15672:15672"  # Management UI port
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    container_name: redis
+    image: redis:latest
+
+  db:
+    container_name: postgres
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  celery_worker:
+    container_name: celery_worker
+    build: .
+    command: celery -A app.create_celery_app.celery_app worker --loglevel=info
+    volumes:
+      - .:/code
+    env_file:
+      - compose.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+  flower:
+    container_name: flower
+    build: .
+    command: celery -A app.create_celery_app.celery_app flower --port=5555
+    ports:
+      - 5555:5555
+    env_file:
+      - compose.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      app:
+        condition: service_started
+      celery_worker:
+        condition: service_started
+
+  app:
+    container_name: app
+    build: .
+    volumes:
+      - .:/code
+    env_file:
+      - compose.env
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    env_file:
+      - compose.env
+    ports:
+      - 5050:80
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
