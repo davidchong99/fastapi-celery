@@ -9,8 +9,9 @@ As the name suggests, this API can solve a [knapsack packing problem](https://en
 * [OR-Tools from Google](https://developers.google.com/optimization/pack/knapsack)
 
 ## Compile and run
-Docker should be installed on local machine.
+Docker should be installed on local machine. 
 ```console
+sudo apt install build-essential python3-dev libpq-dev -y
 cd knapsack_api
 python3 -m venv venv
 source venv/bin/activate
