@@ -1,11 +1,11 @@
-# Knapsack API
-As the name suggests, this API can solve a [knapsack packing problem](https://en.wikipedia.org/wiki/Knapsack_problem). This is a fully functional asynchronous API implemented with the following stacks:
+# FastApi + Celery: for asynchronous tasks 
+This API can solve a [knapsack packing problem](https://en.wikipedia.org/wiki/Knapsack_problem) by running celery tasks asynchronously.\
+It is implemented with the following stacks:
 * FastAPI web framework
 * Celery
 * RabbitMQ
-* Pydantic
+* Pydantic validation
 * Postgres
-* SQLModel
 * [OR-Tools from Google](https://developers.google.com/optimization/pack/knapsack)
 
 ## Compile and run
