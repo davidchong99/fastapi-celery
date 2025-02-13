@@ -43,8 +43,6 @@ The response looks like:
 {"task_id":"c31917fe-d1e7-49a3-b6c7-67f1e58f93a7","status":"COMPLETED","capacity":100,"weights":[45,68,5,15,32,21],"values":[30,23,3,60,15,29],"solution":{"total_value":122,"total_weight":86,"packed_items":[0,2,3,5]}}
 ```
 
-## Load test
-With the knapsack API running, the load test can be run from the API root directory as below:
-```console
-python tests/load_test.py
-```
+## Test
+End-to-end tests are found in tests/e2e_tests.\
+The run_tests.sh script will set up the env before running all tests with pytest.
