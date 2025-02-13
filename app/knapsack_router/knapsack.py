@@ -1,6 +1,5 @@
 from uuid import UUID
-from fastapi import APIRouter, Depends, status, HTTPException
-from typing import Annotated
+from fastapi import APIRouter, status, HTTPException
 
 from app.common.exceptions import TaskNotFoundException, TaskNotCompletedException
 from app.knapsack_router import service
@@ -8,7 +7,6 @@ from app.knapsack_router.dto import (
     ProblemInput,
     ProblemResponse,
     SolutionResponse,
-    Solution,
 )
 
 router = APIRouter()
@@ -19,8 +17,7 @@ router = APIRouter()
     response_model=ProblemResponse,
 )
 def solve_knapsack_problem(problem: ProblemInput):
-    result = service.solve(problem)
-    return result
+    return service.solve(problem)
 
 
 @router.get(

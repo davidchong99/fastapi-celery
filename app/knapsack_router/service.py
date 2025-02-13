@@ -14,6 +14,7 @@ def solve(problem: ProblemInput):
         kwargs={"status": "PENDING", **problem.model_dump()}
     )
 
+    # result.id is returned by celery worker
     return ProblemResponse(
         task_id=result.id,
         status="PENDING",
@@ -33,8 +34,6 @@ def get_solution(task_id: UUID):
         raise TaskNotCompletedException
 
     data = result.get()
-    print(f"service data: {data}")
-
     return SolutionResponse(
         task_id=task_id,
         status=data["status"],
