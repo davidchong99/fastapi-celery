@@ -11,7 +11,7 @@ def create_celery_app() -> Celery:
 
     celery_app.conf.update(
         imports=[
-            "app.components.knapsack.celery_tasks"  # path to celery tasks file
+            "app.knapsack_router.celery_tasks"  # path to celery tasks file
         ],
         broker_connection_retry_on_startup=True,
         task_track_started=True,

@@ -1,17 +1,21 @@
-import logging
 import uvicorn
-
-from app.create_app import create_app
+from fastapi import FastAPI
+from fastapi.responses import PlainTextResponse
 from app.env import SETTINGS
+from app.knapsack_router import knapsack
+
+app = FastAPI(title="FastAPI-celery", version="1.0.0")
+
+app.include_router(knapsack.router, prefix="/knapsack")
 
 
-# Create app
-app = create_app()
+@app.get("/", response_class=PlainTextResponse)
+def get_root():
+    return "Root ..."
+
 
 if __name__ == "__main__":
     # Start server
-    logging.info(f"Server Log Level: {SETTINGS.server_log_level}")
-    logging.info(f"sqlmodel_url : {SETTINGS.sqlmodel_url}")
     uvicorn.run(
         app,
         host="0.0.0.0",

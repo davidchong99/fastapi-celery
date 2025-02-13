@@ -3,9 +3,8 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
-    environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
+    env_file:
+      - compose.env
     ports:
       - "5672:5672"    # AMQP protocol port
       - "15672:15672"  # Management UI port
@@ -15,24 +14,18 @@ services:
       timeout: 10s
       retries: 5
 
-  redis:
-    container_name: redis
-    image: redis:latest
-
   db:
     container_name: postgres
     image: postgres
     restart: always
     ports:
       - 5432:5432
-    environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
+    env_file:
+      - compose.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d sample" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -46,8 +39,6 @@ services:
     env_file:
       - compose.env
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       app:
         condition: service_started
 
@@ -60,8 +51,6 @@ services:
     env_file:
       - compose.env
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       app:
         condition: service_started
       celery_worker:
@@ -77,7 +66,10 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   pgadmin:
     container_name: pgadmin
@@ -89,6 +81,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      app:
+        condition: service_started
 
 volumes:
   postgres_data:
