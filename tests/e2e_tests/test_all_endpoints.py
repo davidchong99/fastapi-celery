@@ -15,7 +15,12 @@ def test_complete_cycle():
     task_id = data["task_id"]
 
     # Retrieve the solution
-    response = requests.get(f"{BASE_URL}/knapsack/solution/{task_id}")
+    status = 202
+    while status == 202:
+        # If the result is not ready, repeat the GET request
+        response = requests.get(f"{BASE_URL}/knapsack/solution/{task_id}")
+        status = response.status_code
+
     assert response.status_code == 200
     data = response.json()
     assert "solution" in data
